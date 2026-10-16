@@ -1,0 +1,44 @@
+{
+  "_sobre": "Identidade FIXA da série. Não mude entre episódios — é isso que mantém o padrão.",
+  "produtora": "CHAPEIRO CHAPADO",
+  "serie": "POR TRÁS DO SET",
+  "serie_titulo": "Por trás do set",
+  "subtitulo_titulo": "AO VIVO  ·  ÁRVORE DA VIDA",
+  "edicao": "ÁRVORE DA VIDA 2026  ·  14 E 15 NOV",
+  "lema": "MÚSICA  ·  ARTE  ·  CONEXÃO  ·  LIBERDADE",
+  "selo_lineup": "NESTE VÍDEO",
+
+  "cores": {
+    "branco": [244, 240, 232],
+    "ambar": [242, 166, 64],
+    "fundo": [9, 9, 10]
+  },
+  "fontes": {
+    "narracao": "Instrument Serif Regular 46px",
+    "impacto": "Anton 74px, caixa alta",
+    "emocao": "Instrument Serif Italic 84px, âmbar com brilho",
+    "rotulos": "Inter Medium / Inter Display SemiBold, caixa alta espaçada",
+    "titulo_artista": "Anton 210px"
+  },
+
+  "duracao_marca": 1.4,
+  "duracao_lineup": 5.0,
+  "poster": "lineup_2026.png",
+  "logo_recorte": [90, 50, 350, 222],
+
+  "lineup_grade": {
+    "_sobre": "Caixas das linhas no pôster 1254x1254: y0 = y_inicio + passo * linha; altura fixa.",
+    "colunas": [[128, 588], [668, 1126]],
+    "y_inicio": 600.3,
+    "passo": 38.8,
+    "altura": 35
+  },
+  "lineup": {
+    "ABERTURA DOS PORTÕES": [0, 0], "BADD": [0, 1], "HUMAN HEART": [0, 2], "LIMBU": [0, 3],
+    "KLIPSUN": [0, 4], "CAMACHO": [0, 5], "SPECTRA SONICS": [0, 6], "AVAN7 VS INE GOA": [0, 7],
+    "FEARSOME ENGINE": [0, 8], "KILLERWATTS": [0, 9], "AVALON": [0, 10],
+    "TRISTAN": [1, 0], "AJJA": [1, 1], "MANDELROT": [1, 2], "RAJA RAM VS TRISTAN": [1, 3],
+    "PIXEL VS WRECKED MACHINES": [1, 4], "SONIC SPECIES": [1, 5], "FUTURE FREQUENCY": [1, 6],
+    "VEGAS": [1, 7], "VERMONT": [1, 8], "FABIO FUSCO": [1, 9], "MORTEN GRANAU": [1, 10]
+  }
+}

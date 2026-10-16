@@ -1,0 +1,42 @@
+{
+  "numero": 1,
+  "artista": "BADD",
+  "acervo": "ACERVO 2022",
+  "original": "original.mp4",
+  "saida": "EP01_BADD_1080.mp4",
+
+  "_recorte": "Faixa 16:9 do original sem as legendas queimadas (achada pelas linhas laranja em y=154-157 e 562-565).",
+  "recorte": "crop=720:400:0:160",
+
+  "_titulo": "Janela do nome do artista sobre a imagem desfocada. Deve cobrir TODO o texto queimado no original, com os fades.",
+  "titulo": {"texto": "BADD", "inicio": 13.65, "fim": 18.35},
+
+  "_cartela": "A cartela final desfoca a imagem; começa antes do texto queimado final (~53.2). O corte para a marca acontece em 'corte_marca'.",
+  "cartela_inicio": 53.05,
+  "corte_marca": 57.20,
+
+  "_drop": "Ataque do drop na trilha original; esse trecho toca sob a marca e a line-up.",
+  "drop": 24.79,
+
+  "narracao": [
+    [0.90, 4.40, "Tem noites que não acabam quando a música para."],
+    [5.00, 8.60, "Elas continuam vivendo dentro da gente."],
+    [9.00, 12.80, "Em 2022, na Árvore da Vida,"],
+    [13.00, 16.10, "milhares de caminhos se cruzaram por um mesmo motivo."],
+    [17.00, 19.90, "E quando BADD encontrou aquela pista,"],
+    [20.00, 21.90, "o que se ouviu foi muito mais que música."],
+    [42.00, 45.90, "Olha de novo. Não são apenas pessoas dançando."],
+    [46.90, 50.90, "São histórias, abraços e lembranças que não se apagam."],
+    [51.90, 55.60, "Porque a festa termina…\nmas o que a gente sente, fica."]
+  ],
+
+  "_frases": "Tipos: impacto (condensada branca, caixa alta), emocao (itálico âmbar), selo (rótulo pequeno com filetes).",
+  "frases": [
+    [0.40, 4.50, "NÃO É SÓ UMA FESTA.", "impacto"],
+    [5.00, 8.90, "É um sentimento.", "emocao"],
+    [10.90, 14.00, "ÁRVORE DA VIDA  ·  2022", "selo"],
+    [22.00, 24.30, "Foi conexão.", "emocao"],
+    [43.00, 48.40, "UMA PISTA. MIL HISTÓRIAS.", "impacto"],
+    [49.00, 53.30, "O sentimento fica.", "emocao"]
+  ]
+}

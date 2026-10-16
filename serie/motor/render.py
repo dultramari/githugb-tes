@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
-"""BADD · Árvore da Vida 2022 — prévia 3, nível 2.
+"""Motor da série "Por trás do set" — Chapeiro Chapado · Árvore da Vida 2026.
 
-Recompõe o vídeo original (720x720, com textos queimados) em 1080x1080:
+Recompõe um vídeo do acervo (720x720, com textos queimados) em 1080x1080 no
+padrão da série:
   - recorta só a faixa de imagem 16:9 (fora das legendas antigas),
   - aplica tratamento de cor, nitidez e grão de filme,
-  - redesenha toda a tipografia com animação (serifada para a narração,
+  - redesenha a tipografia com animação (serifada para a narração,
     condensada para as frases de impacto, itálico âmbar para as emoções),
-  - desfoca a imagem nos dois títulos centrais que estavam queimados na faixa,
+  - desfoca a imagem sob o nome do artista e na cartela final,
+  - fecha com corte para a marca Chapeiro Chapado e 5 s de line-up,
   - normaliza o áudio para -14 LUFS (padrão de redes sociais).
 
-Uso: python3 render.py <video_original.mp4> <saida.mp4> [--frames 10.5,44] [--preview-dir dir]
+A identidade fixa vem de ../marca/marca.json; o roteiro de cada vídeo vem de
+episodios/<ep>/episodio.json.
+
+Uso:
+  python3 motor/render.py episodios/ep01-badd                       # master + entrega
+  python3 motor/render.py episodios/ep01-badd --frames 10,44,60     # só quadros de teste
 """
 import argparse
 import math
@@ -20,17 +27,21 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+import json
+
 HERE = os.path.dirname(os.path.abspath(__file__))
-FONTS = os.path.join(HERE, "fonts")
+MARCA_DIR = os.path.join(HERE, "..", "marca")
+FONTS = os.path.join(MARCA_DIR, "fonts")
+MARCA = json.load(open(os.path.join(MARCA_DIR, "marca.json"), encoding="utf-8"))
 
 W = H = 1080
 FPS = 25
 BAND_Y, BAND_H = 240, 600          # faixa de imagem 16:9 no quadro final
-SRC_CROP = "crop=720:400:0:160"    # área 16:9 do original, sem as linhas laranja
+SRC_CROP = None                    # vem do episódio (área 16:9 do original)
 
-WHITE = (244, 240, 232)
-AMBER = (242, 166, 64)
-BASE = (9, 9, 10)
+WHITE = tuple(MARCA["cores"]["branco"])
+AMBER = tuple(MARCA["cores"]["ambar"])
+BASE = tuple(MARCA["cores"]["fundo"])
 
 
 def font(name, size):
@@ -135,37 +146,49 @@ def cached(key, fn):
     return _cache[key]
 
 
-# ---------------------------------------------------------------- cues
-# Tempos ajustados aos do original para manter a sincronia com a trilha.
-NARRATION = [  # topo, serifada, entrada palavra a palavra
-    (0.90, 4.40, "Tem noites que não acabam quando a música para."),
-    (5.00, 8.60, "Elas continuam vivendo dentro da gente."),
-    (9.00, 12.80, "Em 2022, na Árvore da Vida,"),
-    (13.00, 16.10, "milhares de caminhos se cruzaram por um mesmo motivo."),
-    (17.00, 19.90, "E quando BADD encontrou aquela pista,"),
-    (20.00, 21.90, "o que se ouviu foi muito mais que música."),
-    (42.00, 45.90, "Olha de novo. Não são apenas pessoas dançando."),
-    (46.90, 50.90, "São histórias, abraços e lembranças que não se apagam."),
-    (51.90, 55.60, "Porque a festa termina…\nmas o que a gente sente, fica."),
-]
+# ---------------------------------------------------------------- episódio
+KINDS = {"impacto": "impact", "emocao": "feel", "selo": "stamp"}
+EP = {}
+NARRATION = STATEMENTS = []
+TITLE = END = STING = LINEUP = (0, 0)
+DURATION = DROP_AT = 0.0
+ARTIST_ROW = None
+POSTER = os.path.join(MARCA_DIR, MARCA["poster"])
 
-STATEMENTS = [  # base, condensada (impacto) ou itálico âmbar (emoção)
-    (0.40, 4.50, "NÃO É SÓ UMA FESTA.", "impact"),
-    (5.00, 8.90, "É um sentimento.", "feel"),
-    (10.90, 14.00, "ÁRVORE DA VIDA  ·  2022", "stamp"),
-    (22.00, 24.30, "Foi conexão.", "feel"),
-    (43.00, 48.40, "UMA PISTA. MIL HISTÓRIAS.", "impact"),
-    (49.00, 53.30, "O sentimento fica.", "feel"),
-]
 
-TITLE = (13.65, 18.35)       # "BADD" — queimado no original de ~13.8 a ~18.2 (com fades)
-END = (53.05, 57.20)         # cartela final — "POR TRÁS DO SET" queimado a partir de ~53.2
-STING = (57.20, 58.60)       # corte rápido para a marca Chapeiro Chapado, entra junto com o drop
-LINEUP = (58.60, 63.60)      # line-up da edição 2026, 5 s
-DURATION = LINEUP[1]
-DROP_AT = 24.79              # ataque do drop na trilha original; toca sob a marca e a line-up
-POSTER = os.path.join(HERE, "assets", "lineup_2026.png")
-BADD_ROW = (128, 639, 588, 674)  # linha "13:00 BADD" no pôster (px do original 1254x1254)
+def load_episode(ep_dir):
+    """Lê episodio.json e preenche os parâmetros do render."""
+    global EP, NARRATION, STATEMENTS, TITLE, END, STING, LINEUP, DURATION, DROP_AT, SRC_CROP, ARTIST_ROW
+    EP = json.load(open(os.path.join(ep_dir, "episodio.json"), encoding="utf-8"))
+    EP["dir"] = ep_dir
+    SRC_CROP = EP["recorte"]
+    NARRATION = [tuple(x) for x in EP["narracao"]]
+    STATEMENTS = [(a, b, txt, KINDS[k]) for a, b, txt, k in EP["frases"]]
+    TITLE = (EP["titulo"]["inicio"], EP["titulo"]["fim"])
+    END = (EP["cartela_inicio"], EP["corte_marca"])
+    STING = (END[1], END[1] + MARCA["duracao_marca"])
+    LINEUP = (STING[1], STING[1] + MARCA["duracao_lineup"])
+    DURATION = LINEUP[1]
+    DROP_AT = EP["drop"]
+    ARTIST_ROW = lineup_row(EP.get("lineup", EP["artista"]))
+    _cache.clear()
+
+
+def lineup_row(name):
+    """Caixa (x0, y0, x1, y1) da linha do artista no pôster, ou None se não estiver na line-up."""
+    pos = MARCA["lineup"].get(name.upper())
+    if pos is None:
+        print(f"aviso: '{name}' não está no mapa da line-up; sem destaque", file=sys.stderr)
+        return None
+    g = MARCA["lineup_grade"]
+    col, row = pos
+    x0, x1 = g["colunas"][col]
+    y0 = g["y_inicio"] + g["passo"] * row
+    return (x0, y0, x1, y0 + g["altura"])
+
+
+def ep_label():
+    return f"EP. {EP['numero']:02d}"
 
 
 def env(t, t0, t1, fin=0.5, fout=0.35):
@@ -283,12 +306,12 @@ def draw_chrome(canvas, t, end_k):
         return
     fl = font("label", 15)
     fb = font("label-b", 15)
-    left, pl = cached("h-l", lambda: render_text("CHAPEIRO CHAPADO", fb, WHITE, 4.5))
-    right, pr = cached("h-r", lambda: render_text("ACERVO 2022", fl, WHITE, 4.5))
+    left, pl = cached("h-l", lambda: render_text(MARCA["produtora"], fb, WHITE, 4.5))
+    right, pr = cached("h-r", lambda: render_text(EP["acervo"], fl, WHITE, 4.5))
     paste(canvas, left, 64 - pl, 58 - pl, a * 0.78)
     paste(canvas, right, W - 64 - right.width + pr, 58 - pr, a * 0.5)
-    fl2, pl2 = cached("f-l", lambda: render_text("EP. 01", fb, WHITE, 4.5))
-    fr2, pr2 = cached("f-r", lambda: render_text("BADD  ·  POR TRÁS DO SET", fl, WHITE, 4.5))
+    fl2, pl2 = cached("f-l", lambda: render_text(ep_label(), fb, WHITE, 4.5))
+    fr2, pr2 = cached("f-r", lambda: render_text(f"{EP['artista']}  ·  {MARCA['serie']}", fl, WHITE, 4.5))
     paste(canvas, fl2, 64 - pl2, 1032 - pl2, a * 0.7)
     paste(canvas, fr2, W - 64 - fr2.width + pr2, 1032 - pr2, a * 0.42)
     d = ImageDraw.Draw(canvas)
@@ -313,13 +336,13 @@ def draw_title(canvas, t):
     asc, _ = f.getmetrics()
     paste(canvas, im, (W - im.width) / 2 + tr / 2, cy - asc / 2 - pad - 10, a)
     fs = font("label", 18)
-    sub, sp = cached("title-sub", lambda: render_text("AO VIVO  ·  ÁRVORE DA VIDA", fs, WHITE, 8.0))
+    sub, sp = cached("title-sub", lambda: render_text(MARCA["subtitulo_titulo"], fs, WHITE, 8.0))
     sa = env(t, t0 + 0.8, t1 - 0.1, 0.7, 0.4)
     paste(canvas, sub, (W - sub.width) / 2, cy + asc / 2 + 10 - sp, sa * 0.85)
 
 
 def _title(f, tr, blur):
-    im, pad = render_text("BADD", f, WHITE, tr)
+    im, pad = render_text(EP["titulo"]["texto"], f, WHITE, tr)
     if blur:
         im = im.filter(ImageFilter.GaussianBlur(blur))
     return im, pad
@@ -334,7 +357,7 @@ def draw_end(canvas, t):
     k2 = env(t, t0 + 0.25, t1, 0.7, 0.06)
     k3 = env(t, t0 + 1.2, t1, 0.8, 0.06)
     cy = BAND_Y + BAND_H / 2
-    ep, pe = cached("end-ep", lambda: render_text("EPISÓDIO 01", fk, AMBER, 9.0))
+    ep, pe = cached("end-ep", lambda: render_text(f"EPISÓDIO {EP['numero']:02d}", fk, AMBER, 9.0))
     paste(canvas, ep, (W - ep.width) / 2 + 4, cy - 118 - pe, k2)
     p = ease_out_cubic((t - t0 - 0.55) / 1.4)
     blur = round((1 - p) * 12)
@@ -342,7 +365,7 @@ def draw_end(canvas, t):
     im, pad = cached(("end-t", tr, blur), lambda: _end_title(ft, tr, blur))
     asc, _ = ft.getmetrics()
     paste(canvas, im, (W - im.width) / 2, cy - asc / 2 - pad - 4, k1)
-    cr, pc = cached("end-cr", lambda: render_text("ÁRVORE DA VIDA 2026  ·  14 E 15 NOV", fs, WHITE, 7.0))
+    cr, pc = cached("end-cr", lambda: render_text(MARCA["edicao"], fs, WHITE, 7.0))
     paste(canvas, cr, (W - cr.width) / 2 + 3, cy + 112 - pc, k3 * 0.7)
     d = ImageDraw.Draw(canvas)
     ln = 60 * ease_out_expo((t - t0 - 1.0) / 1.0)
@@ -350,7 +373,7 @@ def draw_end(canvas, t):
 
 
 def _end_title(f, tr, blur):
-    im, pad = render_text("Por trás do set", f, WHITE, tr)
+    im, pad = render_text(MARCA["serie_titulo"], f, WHITE, tr)
     if blur:
         im = im.filter(ImageFilter.GaussianBlur(blur))
     return im, pad
@@ -465,7 +488,7 @@ def poster():
 
 def logo():
     def mk():
-        im = poster().crop((90, 50, 350, 222)).convert("RGBA")
+        im = poster().crop(tuple(MARCA["logo_recorte"])).convert("RGBA")
         im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS)
         # recorte pelo brilho: o fundo do logo no pôster é quase preto
         rgb = np.asarray(im.convert("RGB")).astype(np.float32)
@@ -493,7 +516,7 @@ def compose_sting(t):
         im = im.filter(ImageFilter.GaussianBlur(blur))
     paste(canvas, im, (W - im.width) / 2, 470 - im.height / 2, ease_out_cubic(lt / 0.12))
     f = font("label", 17)
-    tag, pt = cached("sting-tag", lambda: render_text("MÚSICA  ·  ARTE  ·  CONEXÃO  ·  LIBERDADE", f, WHITE, 7.0))
+    tag, pt = cached("sting-tag", lambda: render_text(MARCA["lema"], f, WHITE, 7.0))
     a = ease_out_cubic((lt - 0.25) / 0.4)
     paste(canvas, tag, (W - tag.width) / 2, 690 - pt + (1 - a) * 10, a * 0.72)
     d = ImageDraw.Draw(canvas)
@@ -529,11 +552,11 @@ def compose_lineup(t):
     img = src.transform((W, H), Image.AFFINE,
                         (1 / sk, 0, ax / k - ax / sk, 0, 1 / sk, ay / k - ay / sk),
                         resample=Image.BICUBIC).convert("RGBA")
-    # destaque na linha do BADD: contorno âmbar que pulsa duas vezes
+    # destaque na linha do artista: contorno âmbar que pulsa duas vezes
     x0, y0, x1, y1 = [(v - (ax / k if i % 2 == 0 else ay / k)) * sk + (ax if i % 2 == 0 else ay)
-                      for i, v in enumerate(BADD_ROW)]
+                      for i, v in enumerate(ARTIST_ROW or (0, 0, 0, 0))]
     hk = ease_out_cubic((lt - 0.9) / 0.4) * ease_in_out((t1 - 0.6 - t) / 0.5)
-    if hk > 0:
+    if hk > 0 and ARTIST_ROW:
         pulse = 0.65 + 0.35 * math.cos((lt - 0.9) / 0.84 * 2 * math.pi)
         box = (x0 - 5, y0 - 4, x1 + 5, y1 + 4)
         # ilumina a linha
@@ -548,7 +571,7 @@ def compose_lineup(t):
         paste(img, ov, 0, 0, hk)
         # selo à direita da linha
         f = font("label-b", 13)
-        tag, pt = cached("lu-tag", lambda: render_text("NESTE VÍDEO", f, (20, 12, 8), 2.6))
+        tag, pt = cached("lu-tag", lambda: render_text(MARCA["selo_lineup"], f, (20, 12, 8), 2.6))
         tw, th = tag.width - pt * 2, 13
         bx1 = box[2] - 12
         bx0 = bx1 - tw - 22
@@ -584,7 +607,6 @@ def build_audio(src, dst):
 
 def loudnorm_filter(src):
     """Primeira passada do loudnorm para medir o áudio."""
-    import json
     r = subprocess.run(["ffmpeg", "-hide_banner", "-i", src, "-af",
                         "loudnorm=I=-14:TP=-1.0:LRA=11:print_format=json", "-f", "null", "-"],
                        capture_output=True, text=True)
@@ -595,13 +617,29 @@ def loudnorm_filter(src):
             ).format(**m)
 
 
+def encode_delivery(master, out):
+    """Versão de entrega: menor (cabe no GitHub, < 100 MB) e praticamente igual ao master."""
+    subprocess.run([
+        "ffmpeg", "-v", "error", "-y", "-i", master,
+        "-c:v", "libx264", "-preset", "slow", "-crf", "21", "-maxrate", "10M", "-bufsize", "20M",
+        "-tune", "film", "-profile:v", "high", "-pix_fmt", "yuv420p",
+        "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
+        "-c:a", "copy", "-movflags", "+faststart", out,
+    ], check=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("src")
-    ap.add_argument("out")
+    ap.add_argument("episodio", help="pasta do episódio (com episodio.json e o vídeo original)")
     ap.add_argument("--frames", help="só renderiza quadros nesses tempos (s), separados por vírgula")
-    ap.add_argument("--preview-dir", default=".")
+    ap.add_argument("--preview-dir", help="onde salvar os quadros de teste (padrão: <episodio>/prev)")
     args = ap.parse_args()
+
+    load_episode(args.episodio)
+    src = os.path.join(args.episodio, EP["original"])
+    out = os.path.join(args.episodio, EP["saida"])
+    master = os.path.splitext(out)[0] + "_master.mp4"
+    preview_dir = args.preview_dir or os.path.join(args.episodio, "prev")
 
     grain = make_grain()
     vig_band = make_vignette(W, BAND_H, 0.55)
@@ -609,12 +647,13 @@ def main():
     want = None
     if args.frames:
         want = {int(round(float(x) * FPS)) for x in args.frames.split(",")}
+        os.makedirs(preview_dir, exist_ok=True)
 
-    proc = band_stream(args.src)
+    proc = band_stream(src)
     enc = None
     if want is None:
-        audio = os.path.splitext(args.out)[0] + "_audio.wav"
-        build_audio(args.src, audio)
+        audio = os.path.splitext(out)[0] + "_audio.wav"
+        build_audio(src, audio)
         enc = subprocess.Popen([
             "ffmpeg", "-v", "error", "-y",
             "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
@@ -625,7 +664,7 @@ def main():
             "-profile:v", "high", "-pix_fmt", "yuv420p", "-x264-params", "aq-mode=3",
             "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
             "-c:a", "aac", "-b:a", "256k", "-ar", "48000",
-            "-movflags", "+faststart", "-shortest", args.out,
+            "-movflags", "+faststart", "-shortest", master,
         ], stdin=subprocess.PIPE)
 
     fsize = 1080 * 600 * 3
@@ -647,7 +686,7 @@ def main():
             if enc:
                 enc.stdin.write(frame.tobytes())
             else:
-                Image.fromarray(frame).save(os.path.join(args.preview_dir, f"prev_{t:05.2f}.png"))
+                Image.fromarray(frame).save(os.path.join(preview_dir, f"prev_{t:05.2f}.png"))
         if n % 100 == 0:
             print(f"\r{t:5.1f}s", end="", file=sys.stderr, flush=True)
     proc.stdout.close()
@@ -656,6 +695,8 @@ def main():
         enc.stdin.close()
         enc.wait()
         os.remove(audio)
+        encode_delivery(master, out)
+        print(f"\nentrega: {out} ({os.path.getsize(out) / 1e6:.1f} MB)", file=sys.stderr)
     print(f"\n{total} quadros", file=sys.stderr)
 
 
