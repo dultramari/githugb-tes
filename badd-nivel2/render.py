@@ -159,8 +159,13 @@ STATEMENTS = [  # base, condensada (impacto) ou itálico âmbar (emoção)
 ]
 
 TITLE = (13.65, 18.35)       # "BADD" — queimado no original de ~13.8 a ~18.2 (com fades)
-END = (53.05, 57.80)         # cartela final — "POR TRÁS DO SET" queimado a partir de ~53.2
-DURATION = 57.80
+END = (53.05, 57.20)         # cartela final — "POR TRÁS DO SET" queimado a partir de ~53.2
+STING = (57.20, 58.60)       # corte rápido para a marca Chapeiro Chapado, entra junto com o drop
+LINEUP = (58.60, 63.60)      # line-up da edição 2026, 5 s
+DURATION = LINEUP[1]
+DROP_AT = 24.79              # ataque do drop na trilha original; toca sob a marca e a line-up
+POSTER = os.path.join(HERE, "assets", "lineup_2026.png")
+BADD_ROW = (128, 639, 588, 674)  # linha "13:00 BADD" no pôster (px do original 1254x1254)
 
 
 def env(t, t0, t1, fin=0.5, fout=0.35):
@@ -325,9 +330,9 @@ def draw_end(canvas, t):
     fk = font("label-b", 17)
     ft = font("serif-i", 132)
     fs = font("label", 16)
-    k1 = env(t, t0 + 0.55, t1 - 0.05, 0.9, 0.6)
-    k2 = env(t, t0 + 0.25, t1 - 0.05, 0.7, 0.6)
-    k3 = env(t, t0 + 1.2, t1 - 0.05, 0.8, 0.6)
+    k1 = env(t, t0 + 0.55, t1, 0.9, 0.06)
+    k2 = env(t, t0 + 0.25, t1, 0.7, 0.06)
+    k3 = env(t, t0 + 1.2, t1, 0.8, 0.06)
     cy = BAND_Y + BAND_H / 2
     ep, pe = cached("end-ep", lambda: render_text("EPISÓDIO 01", fk, AMBER, 9.0))
     paste(canvas, ep, (W - ep.width) / 2 + 4, cy - 118 - pe, k2)
@@ -337,7 +342,7 @@ def draw_end(canvas, t):
     im, pad = cached(("end-t", tr, blur), lambda: _end_title(ft, tr, blur))
     asc, _ = ft.getmetrics()
     paste(canvas, im, (W - im.width) / 2, cy - asc / 2 - pad - 4, k1)
-    cr, pc = cached("end-cr", lambda: render_text("BADD  ·  ÁRVORE DA VIDA 2022", fs, WHITE, 7.0))
+    cr, pc = cached("end-cr", lambda: render_text("ÁRVORE DA VIDA 2026  ·  14 E 15 NOV", fs, WHITE, 7.0))
     paste(canvas, cr, (W - cr.width) / 2 + 3, cy + 112 - pc, k3 * 0.7)
     d = ImageDraw.Draw(canvas)
     ln = 60 * ease_out_expo((t - t0 - 1.0) / 1.0)
@@ -441,10 +446,140 @@ def compose(band, t, grain, vig_band, vig_full):
     g = grain[int(t * FPS) % len(grain)]
     lum = out.mean(2, keepdims=True) / 255.0
     out += g[..., None] * (5.5 + 4.0 * (1 - lum))   # grão mais visível nas sombras
-    # fade geral de entrada e saída
-    master = ease_out_cubic(t / 0.5) * ease_in_out((DURATION - t) / 0.7)
+    # fade geral de entrada
+    master = ease_out_cubic(t / 0.5)
     out *= master
     return np.clip(out, 0, 255).astype(np.uint8)
+
+
+# ---------------------------------------------------------------- final: marca + line-up
+_poster = None
+
+
+def poster():
+    global _poster
+    if _poster is None:
+        _poster = Image.open(POSTER).convert("RGB")
+    return _poster
+
+
+def logo():
+    def mk():
+        im = poster().crop((90, 50, 350, 222)).convert("RGBA")
+        im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS)
+        # recorte pelo brilho: o fundo do logo no pôster é quase preto
+        rgb = np.asarray(im.convert("RGB")).astype(np.float32)
+        a = np.clip((rgb.max(2) - 30) / 100, 0, 1)
+        edge = Image.new("L", im.size, 0)
+        ImageDraw.Draw(edge).rectangle((14, 10, im.width - 14, im.height - 10), fill=255)
+        edge = np.asarray(edge.filter(ImageFilter.GaussianBlur(10))) / 255.0
+        im.putalpha(Image.fromarray((a * edge * 255).astype(np.uint8)))
+        return im
+    return cached("logo", mk)
+
+
+def compose_sting(t):
+    t0, t1 = STING
+    lt = t - t0
+    canvas = Image.new("RGBA", (W, H), BASE + (255,))
+    # brilho magenta/laranja da identidade, respirando no ritmo
+    glow = cached("sting-glow", lambda: _sting_glow())
+    paste(canvas, glow, 0, 0, 0.75 + 0.25 * math.cos(lt / 0.42 * 2 * math.pi))
+    lg = logo()
+    s = 1.0 + 0.14 * (1 - ease_out_expo(lt / 0.45)) + 0.02 * lt
+    blur = round((1 - ease_out_expo(lt / 0.3)) * 8)
+    im = lg.resize((int(lg.width * s), int(lg.height * s)), Image.BICUBIC)
+    if blur:
+        im = im.filter(ImageFilter.GaussianBlur(blur))
+    paste(canvas, im, (W - im.width) / 2, 470 - im.height / 2, ease_out_cubic(lt / 0.12))
+    f = font("label", 17)
+    tag, pt = cached("sting-tag", lambda: render_text("MÚSICA  ·  ARTE  ·  CONEXÃO  ·  LIBERDADE", f, WHITE, 7.0))
+    a = ease_out_cubic((lt - 0.25) / 0.4)
+    paste(canvas, tag, (W - tag.width) / 2, 690 - pt + (1 - a) * 10, a * 0.72)
+    d = ImageDraw.Draw(canvas)
+    ln = 70 * ease_out_expo((lt - 0.3) / 0.6)
+    d.line([(W / 2 - ln, 660), (W / 2 + ln, 660)], fill=AMBER + (int(190 * a),), width=1)
+    flash(canvas, lt, 0.4)
+    return canvas
+
+
+def _sting_glow():
+    y, x = np.mgrid[0:H, 0:W].astype(np.float32)
+    r1 = np.exp(-(((x - 420) / 420) ** 2 + ((y - 470) / 300) ** 2))
+    r2 = np.exp(-(((x - 700) / 380) ** 2 + ((y - 520) / 280) ** 2))
+    rgb = (r1[..., None] * np.array([255, 40, 150]) * 0.16 + r2[..., None] * np.array([255, 120, 30]) * 0.10)
+    a = np.full((H, W, 1), 255, np.float32)
+    return Image.fromarray(np.clip(np.concatenate([rgb + BASE, a], 2), 0, 255).astype(np.uint8), "RGBA")
+
+
+def flash(canvas, lt, strength):
+    a = strength * (1 - ease_out_cubic(lt / 0.16))
+    if a > 0.01:
+        canvas.alpha_composite(Image.new("RGBA", (W, H), (255, 246, 236, int(255 * a))))
+
+
+def compose_lineup(t):
+    t0, t1 = LINEUP
+    lt = t - t0
+    src = poster()
+    k = W / src.width
+    s = 1.0 + 0.07 * (1 - ease_out_expo(lt / 0.7)) + 0.022 * ease_in_out(lt / (t1 - t0))
+    ax, ay = W / 2, H * 0.62                      # ancora no meio da timeline
+    sk = s * k
+    img = src.transform((W, H), Image.AFFINE,
+                        (1 / sk, 0, ax / k - ax / sk, 0, 1 / sk, ay / k - ay / sk),
+                        resample=Image.BICUBIC).convert("RGBA")
+    # destaque na linha do BADD: contorno âmbar que pulsa duas vezes
+    x0, y0, x1, y1 = [(v - (ax / k if i % 2 == 0 else ay / k)) * sk + (ax if i % 2 == 0 else ay)
+                      for i, v in enumerate(BADD_ROW)]
+    hk = ease_out_cubic((lt - 0.9) / 0.4) * ease_in_out((t1 - 0.6 - t) / 0.5)
+    if hk > 0:
+        pulse = 0.65 + 0.35 * math.cos((lt - 0.9) / 0.84 * 2 * math.pi)
+        box = (x0 - 5, y0 - 4, x1 + 5, y1 + 4)
+        # ilumina a linha
+        fill = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(fill).rounded_rectangle(box, radius=10, fill=(255, 214, 150, 255))
+        paste(img, fill, 0, 0, hk * 0.16 * pulse)
+        ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(ov).rounded_rectangle(box, radius=10, outline=(255, 226, 170, 255), width=4)
+        glow = ov.filter(ImageFilter.GaussianBlur(12))
+        for _ in range(2):
+            paste(img, glow, 0, 0, hk * pulse)
+        paste(img, ov, 0, 0, hk)
+        # selo à direita da linha
+        f = font("label-b", 13)
+        tag, pt = cached("lu-tag", lambda: render_text("NESTE VÍDEO", f, (20, 12, 8), 2.6))
+        tw, th = tag.width - pt * 2, 13
+        bx1 = box[2] - 12
+        bx0 = bx1 - tw - 22
+        cy = (box[1] + box[3]) / 2
+        pill = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(pill).rounded_rectangle((bx0, cy - 12, bx1, cy + 12), radius=12, fill=AMBER + (255,))
+        pill.alpha_composite(tag, (int(bx0 + 11 - pt), int(cy - th / 2 - pt - 3)))
+        ta = ease_out_cubic((lt - 1.2) / 0.35) * ease_in_out((t1 - 0.6 - t) / 0.5)
+        paste(img, pill, 0, 0, ta)
+    flash(img, lt, 0.35)
+    return img
+
+
+def finish(img, t, grain, amount):
+    out = np.asarray(img.convert("RGB")).astype(np.float32)
+    g = grain[int(t * FPS) % len(grain)]
+    lum = out.mean(2, keepdims=True) / 255.0
+    out += g[..., None] * amount * (1.0 + 0.7 * (1 - lum))
+    out *= ease_in_out((DURATION - t) / 0.7)
+    return np.clip(out, 0, 255).astype(np.uint8)
+
+
+def build_audio(src, dst):
+    """Trilha original até o corte + drop da própria trilha sob a marca e a line-up."""
+    tail = DURATION - STING[0]
+    fc = (f"[0:a]atrim=0:{STING[0]},asetpts=PTS-STARTPTS,afade=t=out:st={STING[0] - 0.06}:d=0.06[a1];"
+          f"[0:a]atrim={DROP_AT}:{DROP_AT + tail},asetpts=PTS-STARTPTS,"
+          f"afade=t=in:d=0.012,afade=t=out:st={tail - 1.9}:d=1.9,volume=-4dB[a2];"
+          f"[a1][a2]concat=n=2:v=0:a=1[a]")
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-filter_complex", fc, "-map", "[a]",
+                    "-c:a", "pcm_s24le", dst], check=True)
 
 
 def loudnorm_filter(src):
@@ -478,12 +613,14 @@ def main():
     proc = band_stream(args.src)
     enc = None
     if want is None:
+        audio = os.path.splitext(args.out)[0] + "_audio.wav"
+        build_audio(args.src, audio)
         enc = subprocess.Popen([
             "ffmpeg", "-v", "error", "-y",
             "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
-            "-i", args.src,
+            "-i", audio,
             "-map", "0:v", "-map", "1:a",
-            "-af", loudnorm_filter(args.src) + f",afade=t=in:d=0.3,afade=t=out:st={DURATION - 0.9}:d=0.9",
+            "-af", loudnorm_filter(audio) + ",afade=t=in:d=0.3",
             "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-tune", "film",
             "-profile:v", "high", "-pix_fmt", "yuv420p", "-x264-params", "aq-mode=3",
             "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
@@ -491,28 +628,35 @@ def main():
             "-movflags", "+faststart", "-shortest", args.out,
         ], stdin=subprocess.PIPE)
 
-    n = 0
     fsize = 1080 * 600 * 3
-    while True:
-        buf = proc.stdout.read(fsize)
-        if len(buf) < fsize:
-            break
+    total = int(round(DURATION * FPS))
+    band = None
+    for n in range(total):
         t = n / FPS
+        if t < STING[0]:
+            buf = proc.stdout.read(fsize)
+            if len(buf) == fsize:
+                band = np.frombuffer(buf, np.uint8).reshape(600, 1080, 3)
         if want is None or n in want:
-            band = np.frombuffer(buf, np.uint8).reshape(600, 1080, 3)
-            frame = compose(band, t, grain, vig_band, vig_full)
+            if t >= LINEUP[0]:
+                frame = finish(compose_lineup(t), t, grain, 2.5)
+            elif t >= STING[0]:
+                frame = finish(compose_sting(t), t, grain, 5.0)
+            else:
+                frame = compose(band, t, grain, vig_band, vig_full)
             if enc:
                 enc.stdin.write(frame.tobytes())
             else:
                 Image.fromarray(frame).save(os.path.join(args.preview_dir, f"prev_{t:05.2f}.png"))
         if n % 100 == 0:
             print(f"\r{t:5.1f}s", end="", file=sys.stderr, flush=True)
-        n += 1
+    proc.stdout.close()
     proc.wait()
     if enc:
         enc.stdin.close()
         enc.wait()
-    print(f"\n{n} quadros", file=sys.stderr)
+        os.remove(audio)
+    print(f"\n{total} quadros", file=sys.stderr)
 
 
 if __name__ == "__main__":
