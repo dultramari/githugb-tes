@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Chapeiro Shop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Chapeiro Shop: 60 modelos em 3D, frente e costas. Básica, Autoral e Premium.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: palco 3D no topo (peça girando + ficha), catálogo filtrável embaixo.
+   Identidade das pranchas: papel creme, tinta roxa de madrugada, laranja da chapa. No escuro vira a pista às 5h. */
+:root{
+  --paper:#EEE7DA; --paper-2:#E4DACA; --card:#F6F1E7; --line:#CDBFA9;
+  --ink:#1D1622; --ink-2:#4B4152; --ink-3:#7A6F7E;
+  --purple:#4E2C70; --on-purple:#F6F1E7; --orange:#D9601F;
+  --stage:radial-gradient(120% 90% at 50% 35%,#F7F2E9 0%,#E6DCCB 70%,#DCD0BC 100%);
+  --display:"Anton","Impact","Arial Narrow Bold",sans-serif;
+  --body:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#141018; --paper-2:#1C1722; --card:#1F1925; --line:#3A3043;
+  --ink:#EFE8DC; --ink-2:#C2B8C6; --ink-3:#8F8496;
+  --purple:#A47BD6; --on-purple:#141018; --orange:#F0803F;
+  --stage:radial-gradient(120% 90% at 50% 35%,#2B2235 0%,#18131D 70%,#110D14 100%);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141018; --paper-2:#1C1722; --card:#1F1925; --line:#3A3043;
+  --ink:#EFE8DC; --ink-2:#C2B8C6; --ink-3:#8F8496;
+  --purple:#A47BD6; --on-purple:#141018; --orange:#F0803F;
+  --stage:radial-gradient(120% 90% at 50% 35%,#2B2235 0%,#18131D 70%,#110D14 100%);
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--paper)}
+body{margin:0;color:var(--ink);font:400 15px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+h1,h2,p{margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+header.top{border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:18px 14px}
+.logo{font:400 clamp(30px,5vw,46px)/1 var(--display);letter-spacing:.01em;text-transform:uppercase}
+.logo span{color:var(--orange)}
+.tag{font:500 11px/1.4 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-2)}
+
+/* palco */
+#stage .wrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);padding-block:28px 40px;align-items:center}
+.viewport{position:relative;aspect-ratio:1/1.02;max-width:100%;border-radius:4px;background:var(--stage);overflow:hidden;border:1px solid var(--line)}
+#stage-canvas{position:absolute;inset:0;cursor:grab;touch-action:none}
+#stage-canvas:active{cursor:grabbing}
+#stage-canvas canvas{display:block;width:100%;height:100%}
+.vp-bar{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{padding:6px 14px;border-radius:999px;font:600 13px/1 var(--body);color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.ghost{padding:7px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font:500 12px/1 var(--mono);letter-spacing:.06em;color:var(--ink-2)}
+.hint{position:absolute;top:12px;left:14px;font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+.info{display:grid;gap:18px;min-width:0}
+.eyebrow{font:500 11px/1.5 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--purple)}
+.title-row{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+#p-code{font:400 clamp(56px,8vw,96px)/.85 var(--display);color:var(--orange)}
+#p-name{font:400 clamp(28px,3.6vw,44px)/1 var(--display);text-transform:uppercase;text-wrap:balance;max-width:14ch}
+.facts{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:5px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--ink-2)}
+#p-desc{font-size:clamp(18px,2vw,22px);line-height:1.35;font-style:italic;max-width:32ch;text-wrap:pretty}
+.label{font:500 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+#p-variants{display:flex;gap:10px;flex-wrap:wrap}
+.variant{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:14px}
+.variant[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.swatch{width:24px;height:24px;border-radius:50%;border:1px solid rgba(127,127,127,.4)}
+#p-note{font-size:13px;color:var(--ink-3);max-width:46ch}
+.nav{display:flex;gap:8px}
+.nav button{padding:10px 16px;border:1px solid var(--line);border-radius:999px;font-weight:600;font-size:14px}
+.nav button:hover{border-color:var(--ink)}
+
+/* catálogo */
+#catalogo{border-top:1px solid var(--line);background:var(--paper-2)}
+#catalogo .wrap{padding-block:32px 56px;display:grid;gap:22px}
+.cat-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.cat-head h2{font:400 clamp(30px,4vw,44px)/1 var(--display);text-transform:uppercase}
+#count{font:500 12px/1 var(--mono);letter-spacing:.1em;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.filters{display:flex;gap:10px 22px;flex-wrap:wrap}
+.filters [data-filter]{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{padding:7px 13px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:500;color:var(--ink-2);background:var(--card)}
+.filters button[aria-pressed="true"]{background:var(--purple);border-color:var(--purple);color:var(--on-purple)}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.card-hit{display:grid;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:4px;overflow:hidden;transition:border-color .2s}
+.card-hit:hover,.card[data-current] .card-hit{border-color:var(--ink)}
+.card-img{position:relative;aspect-ratio:1;max-width:100%;padding:14px;background:var(--stage)}
+.card-img img{position:absolute;inset:14px;width:calc(100% - 28px);height:calc(100% - 28px);object-fit:contain;transition:opacity .35s}
+.card-img img.back{opacity:0}
+.card-hit:hover img.back{opacity:1}
+.card-hit:hover img:not(.back){opacity:0}
+.card-meta{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;padding:12px 14px 14px;align-items:baseline}
+.card-code{font:400 22px/1 var(--display);color:var(--orange);grid-row:span 2}
+.card-name{font-weight:600;font-size:15px;line-height:1.2;min-width:0}
+.card-sub{grid-column:2;font-size:12px;color:var(--ink-3)}
+.dots{grid-column:3;grid-row:1/span 2;display:flex;gap:4px;align-self:center}
+.dot{width:12px;height:12px;border-radius:50%;border:1px solid rgba(127,127,127,.45)}
+
+footer{border-top:1px solid var(--line)}
+footer .wrap{padding-block:22px 34px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 11px/1.6 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+
+@media (max-width:820px){
+  #stage .wrap{grid-template-columns:1fr;padding-block:16px 28px}
+  .viewport{aspect-ratio:1/1.05}
+  #grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .card-meta{grid-template-columns:auto 1fr;padding:10px}
+  .dots{grid-column:2;grid-row:auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="logo">Chapeiro <span>Shop</span></div>
+  <div class="tag">Cultura rave brasileira · 303</div>
+</div></header>
+
+<main>
+<section id="stage"><div class="wrap">
+  <div class="viewport">
+    <div id="stage-canvas" aria-label="Modelo 3D da peça. Arraste para girar, use a roda ou pinça para aproximar."></div>
+    <span class="hint">Arraste para girar</span>
+    <div class="vp-bar">
+      <div class="seg" role="group" aria-label="Lado da peça">
+        <button type="button" data-side="front" aria-pressed="true">Frente</button>
+        <button type="button" data-side="back" aria-pressed="false">Costas</button>
+      </div>
+      <button type="button" class="ghost" id="spin">↻ Girar</button>
+    </div>
+  </div>
+
+  <div class="info">
+    <p class="eyebrow" id="p-eyebrow"></p>
+    <div class="title-row"><span id="p-code"></span><h1 id="p-name"></h1></div>
+    <div class="facts"><span class="chip" id="p-type"></span><span class="chip" id="p-gender"></span></div>
+    <p id="p-desc"></p>
+    <div style="display:grid;gap:10px">
+      <span class="label">Variação</span>
+      <div id="p-variants"></div>
+    </div>
+    <p id="p-note"></p>
+    <div class="nav"><button type="button" id="prev">← Anterior</button><button type="button" id="next">Próximo →</button></div>
+  </div>
+</div></section>
+
+<section id="catalogo"><div class="wrap">
+  <div class="cat-head"><h2>Catálogo</h2><span id="count"></span></div>
+  <div class="filters">
+    <div data-filter="line" role="group" aria-label="Linha">
+      <button type="button" data-value="all" aria-pressed="true">Todas</button>
+      <button type="button" data-value="Básica" aria-pressed="false">Básica</button>
+      <button type="button" data-value="Autoral" aria-pressed="false">Autoral</button>
+      <button type="button" data-value="Premium" aria-pressed="false">Premium</button>
+    </div>
+    <div data-filter="vol" role="group" aria-label="Volume">
+      <button type="button" data-value="all" aria-pressed="true">Vol. 01 + 02</button>
+      <button type="button" data-value="Vol. 01" aria-pressed="false">Vol. 01</button>
+      <button type="button" data-value="Vol. 02" aria-pressed="false">Vol. 02</button>
+    </div>
+    <div data-filter="gender" role="group" aria-label="Modelagem">
+      <button type="button" data-value="all" aria-pressed="true">Todos</button>
+      <button type="button" data-value="masculino" aria-pressed="false">Masculino</button>
+      <button type="button" data-value="feminino" aria-pressed="false">Feminino</button>
+      <button type="button" data-value="unissex" aria-pressed="false">Unissex</button>
+    </div>
+  </div>
+  <div id="grid"></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <span>Estudos de design · não são produtos fabricados</span>
+  <span>Acabamentos a validar em amostra</span>
+</div></footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,722 @@
+{
+"A01a": {
+"color": "Preto",
+"hex": "#141414",
+"w": 394,
+"h": 450
+},
+"A01b": {
+"color": "Off-white",
+"hex": "#e4d7c3",
+"w": 346,
+"h": 440
+},
+"A02a": {
+"color": "Ameixa",
+"hex": "#323131",
+"w": 402,
+"h": 440
+},
+"A02b": {
+"color": "Off-white",
+"hex": "#e4d6c2",
+"w": 384,
+"h": 438
+},
+"A03a": {
+"color": "Preto",
+"hex": "#2e2530",
+"w": 400,
+"h": 492
+},
+"A03b": {
+"color": "Off-white",
+"hex": "#dacbb5",
+"w": 400,
+"h": 488
+},
+"A04a": {
+"color": "Preto",
+"hex": "#141414",
+"w": 402,
+"h": 478
+},
+"A04b": {
+"color": "Roxo",
+"hex": "#4a325e",
+"w": 396,
+"h": 470
+},
+"A05a": {
+"color": "Off-white",
+"hex": "#e4d7c3",
+"w": 400,
+"h": 396
+},
+"A05b": {
+"color": "Preto",
+"hex": "#1e1d1d",
+"w": 400,
+"h": 402
+},
+"A06a": {
+"color": "Roxo",
+"hex": "#49315f",
+"w": 402,
+"h": 472
+},
+"A06b": {
+"color": "Preto",
+"hex": "#141414",
+"w": 384,
+"h": 470
+},
+"A07a": {
+"color": "Off-white",
+"hex": "#e4d7c4",
+"w": 392,
+"h": 406
+},
+"A07b": {
+"color": "Lilás",
+"hex": "#ad8fae",
+"w": 392,
+"h": 406
+},
+"A08a": {
+"color": "Preto",
+"hex": "#282828",
+"w": 402,
+"h": 474
+},
+"A08b": {
+"color": "Off-white",
+"hex": "#e3d6c2",
+"w": 396,
+"h": 470
+},
+"A09a": {
+"color": "Preto",
+"hex": "#131313",
+"w": 400,
+"h": 580
+},
+"A09b": {
+"color": "Malva",
+"hex": "#866b8d",
+"w": 382,
+"h": 574
+},
+"A10a": {
+"color": "Off-white",
+"hex": "#e4d7c2",
+"w": 402,
+"h": 552
+},
+"A10b": {
+"color": "Preto",
+"hex": "#141414",
+"w": 402,
+"h": 554
+},
+"A11a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 458,
+"h": 432
+},
+"A11b": {
+"color": "Off-white",
+"hex": "#e5d6bd",
+"w": 444,
+"h": 428
+},
+"A12a": {
+"color": "Preto",
+"hex": "#282829",
+"w": 458,
+"h": 462
+},
+"A12b": {
+"color": "Lilás",
+"hex": "#ad8fb1",
+"w": 454,
+"h": 462
+},
+"A13a": {
+"color": "Off-white",
+"hex": "#dacbb4",
+"w": 456,
+"h": 468
+},
+"A13b": {
+"color": "Ameixa",
+"hex": "#3b2d3d",
+"w": 454,
+"h": 468
+},
+"A14a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 390,
+"h": 486
+},
+"A14b": {
+"color": "Off-white",
+"hex": "#e4d5bd",
+"w": 376,
+"h": 490
+},
+"A15a": {
+"color": "Preto",
+"hex": "#1e1e1f",
+"w": 458,
+"h": 516
+},
+"A15b": {
+"color": "Off-white",
+"hex": "#e5d5bd",
+"w": 452,
+"h": 518
+},
+"A16a": {
+"color": "Preto",
+"hex": "#1d1d1d",
+"w": 402,
+"h": 406
+},
+"A16b": {
+"color": "Off-white",
+"hex": "#e7d7bf",
+"w": 414,
+"h": 408
+},
+"A17a": {
+"color": "Lilás",
+"hex": "#bb9ab9",
+"w": 400,
+"h": 432
+},
+"A17b": {
+"color": "Preto",
+"hex": "#1d1d1d",
+"w": 396,
+"h": 444
+},
+"A18a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 382,
+"h": 452
+},
+"A18b": {
+"color": "Areia",
+"hex": "#ddcbae",
+"w": 370,
+"h": 446
+},
+"A19a": {
+"color": "Off-white",
+"hex": "#e6d7c1",
+"w": 442,
+"h": 494
+},
+"A19b": {
+"color": "Ameixa",
+"hex": "#2d233c",
+"w": 442,
+"h": 484
+},
+"A20a": {
+"color": "Pêssego",
+"hex": "#eaa07b",
+"w": 430,
+"h": 518
+},
+"A20b": {
+"color": "Preto",
+"hex": "#1e1d1d",
+"w": 420,
+"h": 522
+},
+"B01a": {
+"color": "Preto",
+"hex": "#1f1f1e",
+"w": 412,
+"h": 412
+},
+"B01b": {
+"color": "Off-white",
+"hex": "#e2d7c9",
+"w": 396,
+"h": 410
+},
+"B02a": {
+"color": "Grafite",
+"hex": "#3e3c3b",
+"w": 392,
+"h": 404
+},
+"B02b": {
+"color": "Lilás",
+"hex": "#a792ac",
+"w": 382,
+"h": 404
+},
+"B03a": {
+"color": "Off-white",
+"hex": "#e3d8c9",
+"w": 412,
+"h": 408
+},
+"B03b": {
+"color": "Preto",
+"hex": "#1f1f1e",
+"w": 402,
+"h": 416
+},
+"B04a": {
+"color": "Off-white",
+"hex": "#e4d9ca",
+"w": 386,
+"h": 410
+},
+"B04b": {
+"color": "Preto",
+"hex": "#282726",
+"w": 374,
+"h": 414
+},
+"B05a": {
+"color": "Off-white",
+"hex": "#e2d8c9",
+"w": 420,
+"h": 400
+},
+"B05b": {
+"color": "Grafite",
+"hex": "#54514f",
+"w": 412,
+"h": 412
+},
+"B06a": {
+"color": "Preto",
+"hex": "#1d1d1d",
+"w": 300,
+"h": 404
+},
+"B06b": {
+"color": "Off-white",
+"hex": "#e3d6c5",
+"w": 338,
+"h": 404
+},
+"B07a": {
+"color": "Lilás",
+"hex": "#a891b0",
+"w": 360,
+"h": 326
+},
+"B07b": {
+"color": "Preto",
+"hex": "#1d1d1c",
+"w": 376,
+"h": 328
+},
+"B08a": {
+"color": "Off-white",
+"hex": "#e4d8c9",
+"w": 398,
+"h": 296
+},
+"B08b": {
+"color": "Terracota",
+"hex": "#d46f4e",
+"w": 390,
+"h": 302
+},
+"B09a": {
+"color": "Preto",
+"hex": "#272726",
+"w": 412,
+"h": 406
+},
+"B09b": {
+"color": "Off-white",
+"hex": "#e2d6c6",
+"w": 416,
+"h": 406
+},
+"B10a": {
+"color": "Preto",
+"hex": "#1e1d1d",
+"w": 234,
+"h": 396
+},
+"B10b": {
+"color": "Off-white",
+"hex": "#e4d6c4",
+"w": 250,
+"h": 396
+},
+"B11a": {
+"color": "Preto",
+"hex": "#1f1e1d",
+"w": 520,
+"h": 432
+},
+"B11b": {
+"color": "Off-white",
+"hex": "#d9caba",
+"w": 520,
+"h": 432
+},
+"B12a": {
+"color": "Preto",
+"hex": "#292727",
+"w": 520,
+"h": 440
+},
+"B12b": {
+"color": "Grafite",
+"hex": "#5f4e55",
+"w": 506,
+"h": 440
+},
+"B13a": {
+"color": "Preto",
+"hex": "#1f1e1c",
+"w": 520,
+"h": 432
+},
+"B13b": {
+"color": "Off-white",
+"hex": "#d9cbb8",
+"w": 502,
+"h": 432
+},
+"B14a": {
+"color": "Off-white",
+"hex": "#dacab6",
+"w": 520,
+"h": 432
+},
+"B14b": {
+"color": "Preto",
+"hex": "#1d1c1a",
+"w": 508,
+"h": 432
+},
+"B15a": {
+"color": "Preto",
+"hex": "#2a2725",
+"w": 438,
+"h": 508
+},
+"B15b": {
+"color": "Grafite",
+"hex": "#5b4048",
+"w": 422,
+"h": 508
+},
+"B16a": {
+"color": "Off-white",
+"hex": "#e3d7c6",
+"w": 480,
+"h": 418
+},
+"B16b": {
+"color": "Lilás",
+"hex": "#a793aa",
+"w": 486,
+"h": 420
+},
+"B17a": {
+"color": "Preto",
+"hex": "#1e1c1b",
+"w": 514,
+"h": 424
+},
+"B17b": {
+"color": "Off-white",
+"hex": "#dacbb7",
+"w": 514,
+"h": 422
+},
+"B18a": {
+"color": "Preto",
+"hex": "#161515",
+"w": 400,
+"h": 432
+},
+"B18b": {
+"color": "Off-white",
+"hex": "#dacab7",
+"w": 354,
+"h": 432
+},
+"B19a": {
+"color": "Off-white",
+"hex": "#d8cab8",
+"w": 502,
+"h": 430
+},
+"B19b": {
+"color": "Preto",
+"hex": "#2c2726",
+"w": 514,
+"h": 432
+},
+"B20a": {
+"color": "Pêssego",
+"hex": "#ce9983",
+"w": 514,
+"h": 504
+},
+"B20b": {
+"color": "Preto",
+"hex": "#161514",
+"w": 492,
+"h": 508
+},
+"P01a": {
+"color": "Grafite",
+"hex": "#3d3c3c",
+"w": 496,
+"h": 424
+},
+"P01b": {
+"color": "Off-white",
+"hex": "#e1d7c6",
+"w": 484,
+"h": 420
+},
+"P02a": {
+"color": "Preto",
+"hex": "#151515",
+"w": 492,
+"h": 420
+},
+"P02b": {
+"color": "Off-white",
+"hex": "#e1d7c6",
+"w": 470,
+"h": 420
+},
+"P03a": {
+"color": "Ameixa",
+"hex": "#3d2d3a",
+"w": 500,
+"h": 440
+},
+"P03b": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 488,
+"h": 440
+},
+"P04a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 494,
+"h": 430
+},
+"P04b": {
+"color": "Off-white",
+"hex": "#e0d6c5",
+"w": 478,
+"h": 426
+},
+"P05a": {
+"color": "Preto",
+"hex": "#141414",
+"w": 500,
+"h": 442
+},
+"P05b": {
+"color": "Off-white",
+"hex": "#d7cab7",
+"w": 480,
+"h": 440
+},
+"P06a": {
+"color": "Grafite",
+"hex": "#3d3c3d",
+"w": 496,
+"h": 438
+},
+"P06b": {
+"color": "Off-white",
+"hex": "#d6cab9",
+"w": 456,
+"h": 436
+},
+"P07a": {
+"color": "Preto",
+"hex": "#1f1e1e",
+"w": 508,
+"h": 414
+},
+"P07b": {
+"color": "Off-white",
+"hex": "#d6cbb8",
+"w": 482,
+"h": 406
+},
+"P08a": {
+"color": "Ameixa",
+"hex": "#323132",
+"w": 496,
+"h": 442
+},
+"P08b": {
+"color": "Uva",
+"hex": "#66576e",
+"w": 472,
+"h": 442
+},
+"P09a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 510,
+"h": 490
+},
+"P09b": {
+"color": "Cáqui",
+"hex": "#a8967c",
+"w": 492,
+"h": 494
+},
+"P10a": {
+"color": "Preto",
+"hex": "#1d1c1c",
+"w": 506,
+"h": 480
+},
+"P10b": {
+"color": "Off-white",
+"hex": "#d7cbb8",
+"w": 480,
+"h": 472
+},
+"P11a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 406,
+"h": 400
+},
+"P11b": {
+"color": "Cáqui",
+"hex": "#b29284",
+"w": 392,
+"h": 398
+},
+"P12a": {
+"color": "Preto",
+"hex": "#31252b",
+"w": 410,
+"h": 442
+},
+"P12b": {
+"color": "Off-white",
+"hex": "#e8d7c0",
+"w": 410,
+"h": 444
+},
+"P13a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 410,
+"h": 466
+},
+"P13b": {
+"color": "Off-white",
+"hex": "#dccab3",
+"w": 410,
+"h": 464
+},
+"P14a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 410,
+"h": 448
+},
+"P14b": {
+"color": "Cáqui",
+"hex": "#b09381",
+"w": 410,
+"h": 440
+},
+"P15a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 404,
+"h": 492
+},
+"P15b": {
+"color": "Areia",
+"hex": "#e0c7ab",
+"w": 410,
+"h": 494
+},
+"P16a": {
+"color": "Preto",
+"hex": "#1e1e1d",
+"w": 402,
+"h": 376
+},
+"P16b": {
+"color": "Off-white",
+"hex": "#e7d6c2",
+"w": 400,
+"h": 366
+},
+"P17a": {
+"color": "Preto",
+"hex": "#1d1e1e",
+"w": 310,
+"h": 446
+},
+"P17b": {
+"color": "Off-white",
+"hex": "#e6d7c4",
+"w": 292,
+"h": 442
+},
+"P18a": {
+"color": "Off-white",
+"hex": "#e7d5bf",
+"w": 400,
+"h": 448
+},
+"P18b": {
+"color": "Ameixa",
+"hex": "#332431",
+"w": 394,
+"h": 454
+},
+"P19a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 404,
+"h": 448
+},
+"P19b": {
+"color": "Malva",
+"hex": "#a77176",
+"w": 396,
+"h": 444
+},
+"P20a": {
+"color": "Preto",
+"hex": "#1e1e1e",
+"w": 404,
+"h": 498
+},
+"P20b": {
+"color": "Off-white",
+"hex": "#e6d6c0",
+"w": 404,
+"h": 490
+}
+}
